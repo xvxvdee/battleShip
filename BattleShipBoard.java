@@ -30,7 +30,7 @@ public class BattleShipBoard {
 
 
 
-    //Creating board
+    //Creates game board with randomly generated battleships on board
     public void createBoard() {
         board = new String[10][10];
         for (int i = 0; i < 10; i++) {
@@ -41,7 +41,7 @@ public class BattleShipBoard {
         addBattleShips(shipSizes, rand_gen);
     }
 
-    //Create playerBoard
+    //Create playerBoard (blank)
     public void createUserBoard() {
         userBoard = new String[10][10];
         for (int i = 0; i < 10; i++) {
@@ -51,7 +51,7 @@ public class BattleShipBoard {
         }
     }
 
-    //print board
+    //prints game board (used to debug)
     public void printBoard() {
         for (String[] elem : board) {
             for (String y : elem) {
@@ -59,13 +59,9 @@ public class BattleShipBoard {
             }
             System.out.println();
         }
-        System.out.println(shipOne_5);
-        System.out.println(shipOne_4);
-        System.out.println(shipOne_3);
-        System.out.println(shipTwo_3);
-        System.out.println(shipOne_2);
     }
 
+    //print player board
     public void printUserBoard() {
         for (String[] elem : userBoard) {
             for (String y : elem) {
@@ -73,24 +69,19 @@ public class BattleShipBoard {
             }
             System.out.println();
         }
-        System.out.println(shipOne_5);
-        System.out.println(shipOne_4);
-        System.out.println(shipOne_3);
-        System.out.println(shipTwo_3);
-        System.out.println(shipOne_2);
     }
 
+    //randomly adds battleship to places on board
     public void addBattleShips(int[] shipSizes, Random rand) {
         int x = rand.nextInt(10);
         int y = rand.nextInt(10);
-        //System.out.println(x + "," + y);
 
         for (int a = 0; a < shipSizes.length; a++) {
             int size = shipSizes[a];
             boolean set = false;
             if (horizontal) {
+                //Checks to see if there is space to the left or right. If not generates a new point and repeats
                 do {
-
                     if (y + size < board.length && isEmptyForwardH(x, y, size, board)) {
                         for (int i = 0; i < size; i++) {
                             board[x][y + i] = "O";
@@ -107,12 +98,13 @@ public class BattleShipBoard {
                     if (!set) {
                         x = rand.nextInt(10);
                         y = rand.nextInt(10);
-                        //System.out.println("redoH: " + x + "," + y);
                     }
                 } while (!set);
                 horizontal = false;
                 vertical = true;
             } else if (vertical) {
+                //Checks to see if there is space to the below or above. If not generates a new point and repeats
+
                 do {
                     if (x + 4 < board.length && isEmptyForwardV(x, y, size, board)) {
                         for (int i = 0; i < size; i++) {
@@ -149,6 +141,7 @@ public class BattleShipBoard {
 
     //HELPER METHODS
 
+    //check if space is empty to the right
     public static boolean isEmptyForwardH(int x, int y, int size, String[][] board) {
         for (int i = 0; i < size; i++) {
             if (!(board[x][y + i].equals("."))) {
@@ -157,7 +150,7 @@ public class BattleShipBoard {
         }
         return true;
     }
-
+    //check if space is empty to the left
     public boolean isEmptyBackwardsH(int x, int y, int size, String[][] board) {
         if (!(y > size)) {
             return false;
@@ -171,6 +164,7 @@ public class BattleShipBoard {
         return true;
     }
 
+    //check if space is empty below
     public boolean isEmptyForwardV(int x, int y, int size, String[][] board) {
         for (int i = 0; i < size; i++) {
             if (!(board[x + i][y].equals("."))) {
@@ -179,7 +173,7 @@ public class BattleShipBoard {
         }
         return true;
     }
-
+    //check if space is empty above
     public boolean isEmptyBackwardsV(int x, int y, int size, String[][] board) {
         if (!(x > size)) {
             return false;
@@ -192,7 +186,7 @@ public class BattleShipBoard {
         return true;
     }
 
-    //to coordinate
+    //change coordinate into String format
     public String convertToCoordinate(int x, int y) {
         String newCoordinate = Integer.toString(x) + "," + Integer.toString(y);
         //  System.out.println(newCoordinate);
@@ -243,9 +237,8 @@ public class BattleShipBoard {
         result.clear();
     }
 
-    //sinked a ship
-    public void sinked_Ship() {
-        System.out.println(shipOne_2_check.size());
+    //checking if a ship sunk
+    public void sunk_ship() {
         if (shipOne_5_check.size() == 5) {
             shipOne_5_check.clear();
             count = changedToSink(shipOne_5, count);
@@ -265,22 +258,20 @@ public class BattleShipBoard {
 
     }
 
-    //Changed to sink icon;
+    //Changed to sunk icon;
     public int changedToSink(ArrayList<String> ship, int count) {
-        System.out.println("count out forloop:" +count);
-
         for (int i = 0; i < ship.size(); i++) {
             String[] xy = (ship.get(i).split(","));
             int x = Integer.parseInt(xy[0]), y = Integer.parseInt(xy[1]);
             userBoard[x][y] = "~";
-           // finishGame[
-            System.out.println("count in forloop:" +count);
+
         }
         System.out.println("~~~AN ENTIRE SHIP JUST SUNK..." + (count - 1) + " MORE TO GO!~~~~");
 
         return count - 1;
     }
 
+    //checking if a shit was hit, changes to hit icon and updates ship sunk check
     public boolean changedToHit(ArrayList<String> ship,ArrayList<String> check, int x, int y) {
         for (int i = 0; i < ship.size(); i++) {
             if (ship.get(i).equals(convertToCoordinate(x, y))) {
@@ -297,9 +288,8 @@ public class BattleShipBoard {
     //Check if user won
     public boolean Winner() {
         if (count == 0) {
+            System.out.println();
             System.out.println("YOU HAVE WON!");
-            printUserBoard();
-            printBoard();
             return true;
         }
         return false;
