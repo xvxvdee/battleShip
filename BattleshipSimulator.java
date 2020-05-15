@@ -18,13 +18,21 @@ public class BattleshipSimulator {
 
 
         System.out.println("B A T T L E S H I P");
-        newGame.createBoard();
-        newGame.createUserBoard();
-        newGame.printUserBoard();
+        System.out.println("Welcome to the game! Before playing let's get familiar with some icons.\n* : You've missed\nX : You've hit a ship\n~ : You've sunk a whole ship\n" +
+                "You have 100 tries to hit all\nAlright... now let's start the game.");
+
+
         do {
+            newGame.createBoard();
+            newGame.createUserBoard();
+            newGame.printUserBoard();
 
-            while (!newGame.Winner()) {
-
+            while (!newGame.Winner()||userInputs.size()!=100) {
+                if(userInputs.size()==100){
+                    System.out.println("YOU HAVE RUN OUT OF TRIES.. BETTER LUCK NEXT TIME!");
+                    System.out.println();
+                    break;
+                }
                 do {
                     System.out.print("Enter the x-coordinate: ");
                     x = input.next();
@@ -45,10 +53,12 @@ public class BattleshipSimulator {
                     newGame.Winner();
                     break;
                 }
+
             }
             do {
                 System.out.print("Would you like to play again? (Y(Yes) or N(No)):");
                 play = input.next();
+                userInputs.clear();
             }while(!play.equalsIgnoreCase("Y")&&!play.equalsIgnoreCase("N"));
             playAgain= play.equalsIgnoreCase("y");
         }while(playAgain);
