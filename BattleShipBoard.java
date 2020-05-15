@@ -1,25 +1,34 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Scanner;
 
 public class BattleShipBoard {
     private String[][] board;
-    HashMap<String, Integer> coordinates = new HashMap<>();
-    HashMap<String, Integer> coordinatesTemp = new HashMap<>();
-    String[] ship5 = new String[5];
-    String[] ship4 = new String[4];
-    String[] ship3 = new String[3];
-    String[] ship_3_2 = new String[3];
-    String[] ship2 = new String[2];
-    //key: x-value   value: y-value
+    private String[][] userBoard;
+
+
+    private ArrayList<String> shipOne_5 = new ArrayList<>(5);
+    private ArrayList<String> shipOne_4 = new ArrayList<>(4);
+    private ArrayList<String> shipOne_3 = new ArrayList<>(3);
+    private ArrayList<String> shipTwo_3 = new ArrayList<>(3);
+    private ArrayList<String> shipOne_2 = new ArrayList<>(2);
+    private ArrayList<String> shipOne_5_check = new ArrayList<>();
+    private ArrayList<String> shipOne_4_check = new ArrayList<>();
+    private ArrayList<String> shipOne_3_check = new ArrayList<>();
+    private ArrayList<String> shipTwo_3_check = new ArrayList<>();
+    private ArrayList<String> shipOne_2_check = new ArrayList<>();
+    private int[] shipSizes = {5, 4, 3, 3, 2};
+    boolean[] finishGame = {false, false, false, false, false};
     private Random rand_gen = new Random();
     private boolean horizontal = true, vertical = false;
-    int size = 0;
+    private int count = 5;
+    private int x_coordinate, y_coordinate;
+    private Scanner input = new Scanner(System.in);
 
-    public BattleShipBoard() {
 
-    }
 
     //Creating board
     public void createBoard() {
@@ -29,7 +38,17 @@ public class BattleShipBoard {
                 board[i][j] = (".");
             }
         }
-        addBattleShips();
+        addBattleShips(shipSizes, rand_gen);
+    }
+
+    //Create playerBoard
+    public void createUserBoard() {
+        userBoard = new String[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                userBoard[i][j] = (".");
+            }
+        }
     }
 
     //print board
@@ -40,17 +59,137 @@ public class BattleShipBoard {
             }
             System.out.println();
         }
+        System.out.println(shipOne_5);
+        System.out.println(shipOne_4);
+        System.out.println(shipOne_3);
+        System.out.println(shipTwo_3);
+        System.out.println(shipOne_2);
     }
 
-    //Generate coordinates
-    public int[] generateCoordinates() {
-        int x;
-        int y;
-        do {
-            x = rand_gen.nextInt(10);
-            y = rand_gen.nextInt(10);
-        } while (coordinates.containsKey(convertToCoordinate(x, y)));
-        return new int[]{x, y};
+    public void printUserBoard() {
+        for (String[] elem : userBoard) {
+            for (String y : elem) {
+                System.out.print(y + "  ");
+            }
+            System.out.println();
+        }
+        System.out.println(shipOne_5);
+        System.out.println(shipOne_4);
+        System.out.println(shipOne_3);
+        System.out.println(shipTwo_3);
+        System.out.println(shipOne_2);
+    }
+
+    public void addBattleShips(int[] shipSizes, Random rand) {
+        int x = rand.nextInt(10);
+        int y = rand.nextInt(10);
+        //System.out.println(x + "," + y);
+
+        for (int a = 0; a < shipSizes.length; a++) {
+            int size = shipSizes[a];
+            boolean set = false;
+            if (horizontal) {
+                do {
+
+                    if (y + size < board.length && isEmptyForwardH(x, y, size, board)) {
+                        for (int i = 0; i < size; i++) {
+                            board[x][y + i] = "O";
+                            storeCoordinate(x, y + i, a);
+                        }
+                        set = true;
+                    } else if (y - size < board.length && isEmptyBackwardsH(x, y, size, board)) {
+                        for (int i = 0; i < size; i++) {
+                            board[x][y - i] = "O";
+                            storeCoordinate(x, y - i, a);
+                        }
+                        set = true;
+                    }
+                    if (!set) {
+                        x = rand.nextInt(10);
+                        y = rand.nextInt(10);
+                        //System.out.println("redoH: " + x + "," + y);
+                    }
+                } while (!set);
+                horizontal = false;
+                vertical = true;
+            } else if (vertical) {
+                do {
+                    if (x + 4 < board.length && isEmptyForwardV(x, y, size, board)) {
+                        for (int i = 0; i < size; i++) {
+                            // System.out.println(x + i);
+                            board[x + i][y] = "X";
+                            storeCoordinate(x + i, y, a);
+
+                        }
+                        set = true;
+                    } else if (x - 4 < board.length && isEmptyBackwardsV(x, y, size, board)) {
+
+                        for (int i = 0; i < size; i++) {
+                            //System.out.println(x - i);
+                            board[x - i][y] = "X";
+                            storeCoordinate(x - i, y, a);
+
+                        }
+                        set = true;
+                    }
+                    if (!set) {
+                        x = rand.nextInt(10);
+                        y = rand.nextInt(10);
+                    }
+                } while (!set);
+                vertical = false;
+                horizontal = true;
+            }
+
+
+        }
+
+    }
+
+
+    //HELPER METHODS
+
+    public static boolean isEmptyForwardH(int x, int y, int size, String[][] board) {
+        for (int i = 0; i < size; i++) {
+            if (!(board[x][y + i].equals("."))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isEmptyBackwardsH(int x, int y, int size, String[][] board) {
+        if (!(y > size)) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (!(board[x][y - i].equals("."))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isEmptyForwardV(int x, int y, int size, String[][] board) {
+        for (int i = 0; i < size; i++) {
+            if (!(board[x + i][y].equals("."))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isEmptyBackwardsV(int x, int y, int size, String[][] board) {
+        if (!(x > size)) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (!(board[x - i][y].equals("."))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     //to coordinate
@@ -60,328 +199,109 @@ public class BattleShipBoard {
         return newCoordinate;
     }
 
-    //Placing battleships on board
-    public void addBattleShips() {
-        //The 5 ships are:  Carrier (occupies 5 spaces), Battleship (4), Cruiser (3), Submarine (3), and Destroyer (2)
-
-        int start = 5;
-        while (start != 0) {
-
-            int[] coordin = generateCoordinates();
-            int x_ship = coordin[0];
-            int y_ship = coordin[1];
-            System.out.println("Starting:" + x_ship + "," + y_ship);
-
-            if (start == 5) {
-                if (horizontal) {
-                    placeHorizontal(start, x_ship, y_ship);
-                } else if (vertical) {
-                    placeVertical(start, x_ship, y_ship);
-                }
-            } else if (start == 4) {
-                if (horizontal) {
-                    placeHorizontal(start, x_ship, y_ship);
-                } else if (vertical) {
-                    placeVertical(start, x_ship, y_ship);
-                }
-            } else if (start == 3) {
-                if (horizontal) {
-                    placeHorizontal(start, x_ship, y_ship);
-                } else if (vertical) {
-                    placeVertical(start, x_ship, y_ship);
-                }
-
-            } else if (start == 2) {
-                if (horizontal) {
-                    placeHorizontal(start, x_ship, y_ship);
-                } else if (vertical) {
-                    placeVertical(start, x_ship, y_ship);
-                }
-            }
-//            } else if (start == 1) {
-//                if (horizontal) {
-//                    placeHorizontal(start, x_ship, y_ship);
-//                } else if (vertical) {
-//                    placeVertical(start, x_ship, y_ship);
-//                }
-//
-//            }
-
-            start--;
-            if (start == 0) {
+    //storing coordinate
+    public void storeCoordinate(int x, int y, int size_index) {
+        switch (size_index) {
+            case 0:
+                shipOne_5.add(convertToCoordinate(x, y));
                 break;
-            }
-        }
-        addX();
-    }
-
-
-    //Place battleship horizontal
-    public void placeHorizontal(int start, int x, int y) {
-        int unsualCase = 0;
-        if (start == 1) {
-            unsualCase = 3;
-            int backwards = 1;
-            //do {
-            for (int i = 0; i < unsualCase; i++) {
-
-                if (y + i < board.length) {
-                    int newY = y + i;
-                    //System.out.println("y -horizontal: " + newY);
-                    if (coordinates.containsKey(convertToCoordinate(x, newY)) || coordinates.containsKey(convertToCoordinate(x, newY))) {
-                        System.out.println("redo: new Y");
-                        i = 0;
-                        int[] redo = generateCoordinates();
-                        x = redo[0];
-                        y = redo[1];
-                    } else {
-                        coordinatesTemp.put(convertToCoordinate(x, newY), i);
-                    }
-
-                    System.out.println(x + "," + (newY));
-                } else {
-                    int newY = y - backwards;
-                    System.out.println("y -horizontal: " + newY);
-                    if (coordinates.containsKey(convertToCoordinate(x, newY)) || coordinates.containsKey(convertToCoordinate(x, newY))) {
-                        System.out.println("redo: newY backwards");
-                        i = 0;
-                        int[] redo = generateCoordinates();
-                        x = redo[0];
-                        y = redo[1];
-                    } else {
-                        coordinatesTemp.put(convertToCoordinate(x, newY), i);
-                    }
-                    System.out.println(x + "," + (newY));
-
-                    backwards++;
-                }
-
-
-            }
-        } else {
-            int backwards = 1;
-            //do {
-            for (int i = 0; i < start; i++) {
-
-                if (y + i < board.length) {
-                    int newY = y + i;
-                    //System.out.println("y -horizontal: " + newY);
-                    if (coordinates.containsKey(convertToCoordinate(x, newY)) || coordinates.containsKey(convertToCoordinate(x, newY))) {
-                        System.out.println("redo: new Y");
-                        i = 0;
-                        int[] redo = generateCoordinates();
-                        x = redo[0];
-                        y = redo[1];
-                    } else {
-                        coordinatesTemp.put(convertToCoordinate(x, newY), i);
-                    }
-
-                    System.out.println(x + "," + (newY));
-                } else {
-                    int newY = y - backwards;
-                    System.out.println("y -horizontal: " + newY);
-                    if (coordinates.containsKey(convertToCoordinate(x, newY)) || coordinates.containsKey(convertToCoordinate(x, newY))) {
-                        System.out.println("redo: newY backwards");
-                        i = 0;
-                        int[] redo = generateCoordinates();
-                        x = redo[0];
-                        y = redo[1];
-                    } else {
-                        coordinatesTemp.put(convertToCoordinate(x, newY), i);
-                    }
-                    System.out.println(x + "," + (newY));
-
-                    backwards++;
-                }
-            }
-
-
-        }
-        // }while(!isUnique(tempList));
-        horizontal = false;
-        vertical = true;
-        for (String elem : coordinatesTemp.keySet()) {
-            coordinates.put(elem, coordinatesTemp.get(elem));
-        }
-        keepTrack(start, coordinatesTemp);
-        System.out.println(coordinatesTemp);
-        System.out.println(coordinates);
-        coordinatesTemp.clear();
-    }
-
-
-    //Place battleship vertical
-    public void placeVertical(int start, int x, int y) {
-
-        int backwards = 1;
-        for (int i = 0; i < start; i++) {
-
-            if (x + i < board.length) {
-                int newX = x + i;
-                if (coordinates.containsKey(convertToCoordinate(newX, y)) || coordinates.containsKey(convertToCoordinate(newX, y))) {
-                    System.out.println("redo: newX");
-                    i = 0;
-                    int[] redo = generateCoordinates();
-                    x = redo[0];
-                    y = redo[1];
-                } else {
-                    coordinatesTemp.put(convertToCoordinate(newX, y), i);
-                }
-                //tempList.add(convertToCoordinate(newX, y));
-
-                //}
-                // tempList.add(convertToCoordinate(newX, y));
-                System.out.println(newX + "," + y);
-
-            } else {
-                int newX = x - backwards;
-                //board[x - backwards][y] = "X";
-                if (coordinates.containsKey(convertToCoordinate(newX, y)) || coordinates.containsKey(convertToCoordinate(newX, y))) {
-                    System.out.println("redo: newX backwards");
-                    i = 0;
-                    int[] redo = generateCoordinates();
-                    x = redo[0];
-                    y = redo[1];
-                }//                        tempList.add(convertToCoordinate(newX, y));
-                else {
-                    coordinatesTemp.put(convertToCoordinate(newX, y), i);
-                }
-                // }
-                // tempList.add(convertToCoordinate(newX, y));
-
-                System.out.println(newX + "," + y);
-
-                backwards++;
-
-            }
-            if (coordinatesTemp.size() == start) {
-                break;
-            }
-        }
-        for (String elem : coordinatesTemp.keySet()) {
-            coordinates.put(elem, coordinatesTemp.get(elem));
-        }
-        keepTrack(start, coordinatesTemp);
-        System.out.println(coordinatesTemp);
-        System.out.println(coordinates);
-        coordinatesTemp.clear();
-//            System.out.println("IS UNIQUE: "+isUnique(tempList));
-//            if (!isUnique(tempList)) {
-//                int[] tryagain = generateCoordinates();
-//                x = tryagain[0];
-//                y = tryagain[1];
-//            }
-//            System.out.println(tempList);
-
-        // } while (!isUnique(tempList));
-        vertical = false;
-        horizontal = true;
-    }
-
-//    //checks if temp list is unique
-//    public boolean isUnique(ArrayList<String> list) {
-//        for (String elem : list) {
-//            if (listOfCoordinates.contains(elem)) {
-//                System.out.println(listOfCoordinates.contains(elem));
-//                System.out.println(elem);
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-
-    //add x
-    public void addX() {
-//        for (String elem : coordinates.keySet()) {
-//            String[] xy = elem.split(",");
-//            board[Integer.parseInt(xy[0])][Integer.parseInt(xy[1])] = "X";
-//
-//        }
-
-        for(int i=0;i <ship5.length;i++){
-            String[] xy = ship5[i].split(",");
-            board[Integer.parseInt(xy[0])][Integer.parseInt(xy[1])] = "5";
-        }
-        for(int i=0;i <ship4.length;i++){
-            String[] xy = ship4[i].split(",");
-            board[Integer.parseInt(xy[0])][Integer.parseInt(xy[1])] = "4";
-        }
-        for(int i=0;i <ship3.length;i++){
-            String[] xy = ship3[i].split(",");
-            board[Integer.parseInt(xy[0])][Integer.parseInt(xy[1])] = "3";
-        }
-        for(int i=0;i <ship2.length;i++){
-            String[] xy = ship2[i].split(",");
-            board[Integer.parseInt(xy[0])][Integer.parseInt(xy[1])] = "2";
-        }
-
-    }
-
-    public void keepTrack(int start, HashMap<String, Integer> map) {
-
-        switch (start) {
             case 1:
-                int a = 0;
-                while (a != 3) {
-                    for (String elem : map.keySet()) {
-                        System.out.println(Arrays.toString(ship_3_2)+"{{{{");
-                        ship_3_2[a] = elem;
-                        a++;
-
-                    }
-                }
+                shipOne_4.add(convertToCoordinate(x, y));
                 break;
             case 2:
-                int i = 0;
-                while (i != 2) {
-                    for (String elem : map.keySet()) {
-                        ship2[i] = elem;
-                        i++;
-
-                    }
-                }
+                shipOne_3.add(convertToCoordinate(x, y));
                 break;
             case 3:
-                int b = 0;
-                while (b < 3) {
-                    for (String elem : map.keySet()) {
-                        ship3[b] = elem;
-                        System.out.println(Arrays.toString(ship3) +"<");
-                        b++;
-
-                    }
-                }
+                shipTwo_3.add(convertToCoordinate(x, y));
                 break;
             case 4:
-                int k = 0;
-                while (k != 4) {
-                    for (String elem : map.keySet()) {
-                        ship4[k] = elem;
-                        k++;
-
-                    }
-                }
+                shipOne_2.add(convertToCoordinate(x, y));
                 break;
-            case 5:
-                int l = 0;
-                while (l != 5) {
-                    System.out.println(l);
-                    for (String elem : map.keySet()) {
-                        ship5[l] = elem;
-                        l++;
-                    }
 
-                }
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + start);
         }
-        System.out.println(Arrays.toString(ship2));
-        System.out.println(Arrays.toString(ship3));
-        System.out.println(Arrays.toString(ship_3_2));
-        System.out.println(Arrays.toString(ship4));
-        System.out.println(Arrays.toString(ship5));
+    }
+
+
+    //playerGuessCheck
+    public void playerOne_GuessCheck(int x, int y) {
+        ArrayList<Boolean> result = new ArrayList<Boolean>();
+        result.add(true);
+        result.add(true);
+        result.add(true);
+        result.add(true);
+        result.add(true);
+
+        result.set(0, changedToHit(shipOne_5,shipOne_5_check, x, y));
+        result.set(1, changedToHit(shipOne_4,shipOne_4_check, x, y));
+        result.set(2, changedToHit(shipOne_3,shipOne_3_check, x, y));
+        result.set(3, changedToHit(shipTwo_3,shipTwo_3_check, x, y));
+        result.set(4, changedToHit(shipOne_2,shipOne_2_check, x, y));
+        if (!result.contains(true)) {
+            System.out.println("YOU MISSED");
+            userBoard[x][y]="*";
+        }
+        result.clear();
+    }
+
+    //sinked a ship
+    public void sinked_Ship() {
+        System.out.println(shipOne_2_check.size());
+        if (shipOne_5_check.size() == 5) {
+            shipOne_5_check.clear();
+            count = changedToSink(shipOne_5, count);
+        } else if (shipOne_4_check.size() == 4) {
+            shipOne_4_check.clear();
+            count = changedToSink(shipOne_4, count);
+        } else if (shipOne_3_check.size() == 3) {
+            shipOne_3_check.clear();
+            count = changedToSink(shipOne_3, count);
+        } else if (shipTwo_3_check.size() == 3) {
+            shipTwo_3_check.clear();
+            count = changedToSink(shipTwo_3, count);
+        } else if (shipOne_2_check.size() == 2) {
+            shipOne_2_check.clear();
+            count = changedToSink(shipOne_2, count);
+        }
 
     }
 
+    //Changed to sink icon;
+    public int changedToSink(ArrayList<String> ship, int count) {
+        System.out.println("count out forloop:" +count);
+
+        for (int i = 0; i < ship.size(); i++) {
+            String[] xy = (ship.get(i).split(","));
+            int x = Integer.parseInt(xy[0]), y = Integer.parseInt(xy[1]);
+            userBoard[x][y] = "~";
+           // finishGame[
+            System.out.println("count in forloop:" +count);
+        }
+        System.out.println("~~~AN ENTIRE SHIP JUST SUNK..." + (count - 1) + " MORE TO GO!~~~~");
+
+        return count - 1;
+    }
+
+    public boolean changedToHit(ArrayList<String> ship,ArrayList<String> check, int x, int y) {
+        for (int i = 0; i < ship.size(); i++) {
+            if (ship.get(i).equals(convertToCoordinate(x, y))) {
+                userBoard[x][y] = "X";
+                check.add("!");
+                System.out.println("YOU HIT A SHIP!");
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //Check if user won
+    public boolean Winner() {
+        if (count == 0) {
+            System.out.println("YOU HAVE WON!");
+            printUserBoard();
+            printBoard();
+            return true;
+        }
+        return false;
+    }
 }
