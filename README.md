@@ -13,9 +13,9 @@ The board game battleship turned into a commandline game using java. Play agains
  
  ## How to use?
  Icons that will appear on the board
- - * : You've missed
- - X : You've hit a ship
- - ~ : You've sunk a whole ship
+ - "*" : You've missed
+ - "X" : You've hit a ship
+ - "~" : You've sunk a whole ship
  
  To target a ship you will be prompted to enter the x and y coordinate of where you think a ship is.
  You will be notified in text when you hit or miss a ship.
