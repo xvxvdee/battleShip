@@ -1,5 +1,5 @@
 # BattleShip
-The board game battleship turned into a commandline game using java. Play against the computer. You have 100 tries to sink all ships
+The board game battleship turned into a command line game using java. Play against the computer. You have 100 tries to sink all ships
 
 ## Built with
 - Java
