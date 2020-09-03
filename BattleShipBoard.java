@@ -271,7 +271,7 @@ public class BattleShipBoard {
         return count - 1;
     }
 
-    //checking if a shit was hit, changes to hit icon and updates ship sunk check
+    //checking if a ship was hit, changes to hit icon and updates ship sunk check
     public boolean changedToHit(ArrayList<String> ship,ArrayList<String> check, int x, int y) {
         for (int i = 0; i < ship.size(); i++) {
             if (ship.get(i).equals(convertToCoordinate(x, y))) {
