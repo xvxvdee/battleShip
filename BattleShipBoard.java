@@ -21,7 +21,6 @@ public class BattleShipBoard {
     private ArrayList<String> shipTwo_3_check = new ArrayList<>();
     private ArrayList<String> shipOne_2_check = new ArrayList<>();
     private int[] shipSizes = {5, 4, 3, 3, 2};
-    boolean[] finishGame = {false, false, false, false, false};
     private Random rand_gen = new Random();
     private boolean horizontal = true, vertical = false;
     private int count = 5;
