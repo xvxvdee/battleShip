@@ -106,7 +106,7 @@ public class BattleShipBoard {
                 //Checks to see if there is space to the below or above. If not generates a new point and repeats
 
                 do {
-                    if (x + 4 < board.length && isEmptyForwardV(x, y, size, board)) {
+                    if (x + size < board.length && isEmptyForwardV(x, y, size, board)) {
                         for (int i = 0; i < size; i++) {
                             // System.out.println(x + i);
                             board[x + i][y] = "X";
@@ -114,7 +114,7 @@ public class BattleShipBoard {
 
                         }
                         set = true;
-                    } else if (x - 4 < board.length && isEmptyBackwardsV(x, y, size, board)) {
+                    } else if (x - size < board.length && isEmptyBackwardsV(x, y, size, board)) {
 
                         for (int i = 0; i < size; i++) {
                             //System.out.println(x - i);
